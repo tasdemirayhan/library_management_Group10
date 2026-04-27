@@ -170,6 +170,7 @@ class BookRepositoryIT extends AbstractIntegrationTest {
         void shouldDeleteBook() {
             // TODO: Save a book, delete it, verify it's gone
             fail("Not implemented yet");
+            // This is added by Furkan
         }
     }
 }
