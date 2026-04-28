@@ -267,19 +267,65 @@ class LibraryApiIT extends AbstractIntegrationTest {
         @Test
         @DisplayName("should search books by keyword via GET /api/books/search?keyword=...")
         void shouldSearchBooks() {
-            // TODO: Create several books, search by keyword, verify results
-            fail("Not implemented yet");
+            createTestBook("978-1", "Anna Karenina", "Tolstoy");
+            createTestBook("978-2", "Recep İvedik", "Şahan Gökbakar");
+            createTestBook("978-3", "Tehlikeli Oyunlar", "Oğuz Atay");
+
+            // title match (case-insensitive)
+            ResponseEntity<Book[]> titleResponse = restTemplate.getForEntity(
+                    baseUrl + "/books/search?keyword=anna", Book[].class);
+            assertThat(titleResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(titleResponse.getBody()).hasSize(1);
+            assertThat(titleResponse.getBody()[0].getTitle()).isEqualTo("Anna Karenina");
+
+            // author match (case-insensitive)
+            ResponseEntity<Book[]> authorResponse = restTemplate.getForEntity(
+                    baseUrl + "/books/search?keyword=atay", Book[].class);
+            assertThat(authorResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(authorResponse.getBody()).hasSize(1);
+            assertThat(authorResponse.getBody()[0].getTitle()).isEqualTo("Tehlikeli Oyunlar");
+
+            // no match
+            ResponseEntity<Book[]> noMatchResponse = restTemplate.getForEntity(
+                
+                    baseUrl + "/books/search?keyword=xyz_no_match", Book[].class);
+            assertThat(noMatchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(noMatchResponse.getBody()).isEmpty();
         }
 
         @Test
         @DisplayName("should get active borrows for a member")
         void shouldGetActiveBorrows() {
-            // TODO:
             // 1. Create a member and 2 books
+            Member member = createTestMember("Bob", "bob@test.com", MembershipType.STANDARD);
+            Book book1 = createTestBook("978-10", "Book One", "Author One");
+            Book book2 = createTestBook("978-11", "Book Two", "Author Two");
+
             // 2. Borrow both books
+            BorrowRequest borrowRequest1 = new BorrowRequest(book1.getId(), member.getId());
+            ResponseEntity<Map> borrow1Response = restTemplate.postForEntity(
+                    baseUrl + "/borrows", borrowRequest1, Map.class);
+            assertThat(borrow1Response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            BorrowRequest borrowRequest2 = new BorrowRequest(book2.getId(), member.getId());
+            ResponseEntity<Map> borrow2Response = restTemplate.postForEntity(
+                    baseUrl + "/borrows", borrowRequest2, Map.class);
+            assertThat(borrow2Response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
             // 3. Return one of them
+            Number borrow1Id = (Number) borrow1Response.getBody().get("id");
+            restTemplate.postForEntity(
+                    baseUrl + "/borrows/" + borrow1Id.longValue() + "/return",
+                    null, Map.class);
+
             // 4. GET /api/borrows/member/{id}/active — should return only 1
-            fail("Not implemented yet");
+            ResponseEntity<Map[]> activeResponse = restTemplate.getForEntity(
+                    baseUrl + "/borrows/member/" + member.getId() + "/active", Map[].class);
+
+            assertThat(activeResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(activeResponse.getBody()).hasSize(1);
+            assertThat(activeResponse.getBody()[0].get("bookTitle")).isEqualTo("Book Two");
+            assertThat(activeResponse.getBody()[0].get("status")).isEqualTo("BORROWED");
         }
     }
 }
