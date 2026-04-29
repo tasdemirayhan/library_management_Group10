@@ -195,12 +195,28 @@ class LibraryApiIT extends AbstractIntegrationTest {
         @Test
         @DisplayName("should return 409 when borrowing limit exceeded")
         void shouldReturn409_WhenBorrowLimitExceeded() {
-            // TODO:
+
             // 1. Create a STUDENT member (limit = 2 books)
+            Member studentTester = createTestMember("Alvarez", "alvarez@atm.com", MembershipType.STUDENT);
+
             // 2. Create 3 different books
+            Book bookTester1 = createTestBook("980-1", "Book1", "Author1");
+            Book bookTester2 = createTestBook("980-2", "Book2", "Author2");
+            Book bookTester3 = createTestBook("980-3", "Book3", "Author3");
+
             // 3. Borrow 2 books successfully
+            ResponseEntity<Map> borrow1 = restTemplate.postForEntity(
+                    baseUrl + "/borrows", new BorrowRequest(bookTester1.getId(), studentTester.getId()), Map.class);
+            assertThat(borrow1.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+            ResponseEntity<Map> borrow2 = restTemplate.postForEntity(
+                    baseUrl + "/borrows", new BorrowRequest(bookTester2.getId(), studentTester.getId()), Map.class);
+            assertThat(borrow2.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
             // 4. Try to borrow a 3rd book — should return 409 CONFLICT
-            fail("Not implemented yet");
+            ResponseEntity<Map> borrow3 = restTemplate.postForEntity(
+                    baseUrl + "/borrows", new BorrowRequest(bookTester3.getId(), studentTester.getId()), Map.class);
+            assertThat(borrow3.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         }
 
         @Test
@@ -237,7 +253,7 @@ class LibraryApiIT extends AbstractIntegrationTest {
         @DisplayName("should create a member and return 201")
         void shouldCreateMember() {
             // TODO: POST a new member to /api/members
-            //       Verify 201 status and response body
+            // Verify 201 status and response body
             fail("Not implemented yet");
         }
 
@@ -255,7 +271,7 @@ class LibraryApiIT extends AbstractIntegrationTest {
         @DisplayName("should return 400 when creating member with invalid email")
         void shouldReturn400_WhenInvalidEmail() {
             // TODO: POST a member with an invalid email
-            //       Verify 400 BAD REQUEST
+            // Verify 400 BAD REQUEST
             fail("Not implemented yet");
         }
     }
@@ -287,7 +303,7 @@ class LibraryApiIT extends AbstractIntegrationTest {
 
             // no match
             ResponseEntity<Book[]> noMatchResponse = restTemplate.getForEntity(
-                
+
                     baseUrl + "/books/search?keyword=xyz_no_match", Book[].class);
             assertThat(noMatchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(noMatchResponse.getBody()).isEmpty();
@@ -298,8 +314,8 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldGetActiveBorrows() {
             // 1. Create a member and 2 books
             Member member = createTestMember("Bob", "bob@test.com", MembershipType.STANDARD);
-            Book book1 = createTestBook("978-10", "Book One", "Author One");
-            Book book2 = createTestBook("978-11", "Book Two", "Author Two");
+            Book book1 = createTestBook("978-0-13-468599-1", "Book One", "Author One");
+            Book book2 = createTestBook("978-0-13-468599-2", "Book Two", "Author Two");
 
             // 2. Borrow both books
             BorrowRequest borrowRequest1 = new BorrowRequest(book1.getId(), member.getId());
