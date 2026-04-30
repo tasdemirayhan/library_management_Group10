@@ -6,6 +6,8 @@ import com.example.library.repository.BookRepository;
 import com.example.library.repository.BorrowRecordRepository;
 import com.example.library.repository.MemberRepository;
 import com.example.library.dto.BorrowRequest;
+
+import org.apache.commons.compress.archivers.dump.DumpArchiveEntry.TYPE;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -224,10 +226,20 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldReturn409_WhenNoCopiesAvailable() {
             // TODO:
             // 1. Create a book with totalCopies = 1
+            Book testBook = new Book("987-1", "Alex De Souza", "Rob Green", 1, Genre.BIOGRAPHY);
+            testBook = bookRepository.save(testBook);
             // 2. Create 2 members
+            Member member1 = createTestMember("Name1", "mail1@gmail.com", MembershipType.STANDARD);
+            Member member2 = createTestMember("Name2", "mail2@gmail.com", MembershipType.STANDARD);
             // 3. First member borrows the book successfully
+            ResponseEntity<Map> returnResponse1 = restTemplate.postForEntity(baseUrl + "/borrows",
+                    new BorrowRequest(testBook.getId(), member1.getId()), Map.class);
+            assertThat(returnResponse1.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
             // 4. Second member tries to borrow — should return 409
-            fail("Not implemented yet");
+            ResponseEntity<Map> returnResponse2 = restTemplate.postForEntity(baseUrl + "/borrows",
+                    new BorrowRequest(testBook.getId(), member2.getId()), Map.class);
+            assertThat(returnResponse2.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         }
 
         @Test
@@ -245,7 +257,8 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldReturn404_WhenBookNotFound() {
             // TODO: Try to borrow a non-existent bookId
             Member member = createTestMember("Alvarez", "alvarez@atm.com", MembershipType.STANDARD);
-            ResponseEntity<Map> returnResponse =restTemplate.postForEntity(baseUrl + "/borrows", new BorrowRequest(123L, member.getId()), Map.class);
+            ResponseEntity<Map> returnResponse = restTemplate.postForEntity(baseUrl + "/borrows",
+                    new BorrowRequest(123L, member.getId()), Map.class);
             assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
     }
@@ -288,18 +301,22 @@ class LibraryApiIT extends AbstractIntegrationTest {
         @Test
         @DisplayName("should search books by keyword via GET /api/books/search?keyword=...")
         void shouldSearchBooks() {
+                        // TODO: Create several books, search by keyword, verify results
+
             createTestBook("978-1", "Anna Karenina", "Tolstoy");
             createTestBook("978-2", "Recep İvedik", "Şahan Gökbakar");
             createTestBook("978-3", "Tehlikeli Oyunlar", "Oğuz Atay");
 
-            // title match (case-insensitive)
+            // According to title 
             ResponseEntity<Book[]> titleResponse = restTemplate.getForEntity(
                     baseUrl + "/books/search?keyword=anna", Book[].class);
             assertThat(titleResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(titleResponse.getBody()).hasSize(1);
             assertThat(titleResponse.getBody()[0].getTitle()).isEqualTo("Anna Karenina");
+            assertThat(titleResponse.getBody()[0].getAuthor()).isEqualTo("Tolstoy");
 
-            // author match (case-insensitive)
+
+            // According to author match 
             ResponseEntity<Book[]> authorResponse = restTemplate.getForEntity(
                     baseUrl + "/books/search?keyword=atay", Book[].class);
             assertThat(authorResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -309,7 +326,7 @@ class LibraryApiIT extends AbstractIntegrationTest {
             // no match
             ResponseEntity<Book[]> noMatchResponse = restTemplate.getForEntity(
 
-                    baseUrl + "/books/search?keyword=xyz_no_match", Book[].class);
+                    baseUrl + "/books/search?keyword=no_match", Book[].class);
             assertThat(noMatchResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(noMatchResponse.getBody()).isEmpty();
         }
@@ -317,6 +334,7 @@ class LibraryApiIT extends AbstractIntegrationTest {
         @Test
         @DisplayName("should get active borrows for a member")
         void shouldGetActiveBorrows() {
+            // TODO:
             // 1. Create a member and 2 books
             Member member = createTestMember("Bob", "bob@test.com", MembershipType.STANDARD);
             Book book1 = createTestBook("978-0-13-468599-1", "Book One", "Author One");
