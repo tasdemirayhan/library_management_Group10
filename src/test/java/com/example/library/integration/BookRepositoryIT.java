@@ -120,13 +120,28 @@ class BookRepositoryIT extends AbstractIntegrationTest {
     @DisplayName("Genre and author queries")
     class FilterTests {
 
+
+
         @Test
         @DisplayName("should find books by genre")
         void shouldFindByGenre() {
-            // TODO: Save books of different genres
-            //       Query by Genre.SCIENCE and verify only matching books are returned
-            fail("Not implemented yet");
+            // Arrange
+            createBook("isbn-1", "Physics 101", "Author A", 3, Genre.SCIENCE);
+            createBook("isbn-2", "Chemistry Basics", "Author B", 2, Genre.SCIENCE);
+            createBook("isbn-3", "Harry Potter", "J.K. Rowling", 5, Genre.FICTION);
+
+            // Act
+            List<Book> results = bookRepository.findByGenre(Genre.SCIENCE);
+
+            // Assert
+            assertThat(results).hasSize(2);
+            assertThat(results)
+                    .extracting(Book::getTitle)
+                    .containsExactlyInAnyOrder("Physics 101", "Chemistry Basics");
+            // assertThat(results).allMatch(book -> book.getGenre() == Genre.SCIENCE); // to make it more strict
         }
+
+        
 
         @Test
         @DisplayName("should find books by author (case insensitive, partial match)")
