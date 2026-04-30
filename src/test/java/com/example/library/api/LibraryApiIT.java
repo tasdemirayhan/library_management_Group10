@@ -205,18 +205,18 @@ class LibraryApiIT extends AbstractIntegrationTest {
             Book bookTester3 = createTestBook("980-3", "Book3", "Author3");
 
             // 3. Borrow 2 books successfully
-            ResponseEntity<Map> borrow1 = restTemplate.postForEntity(
+            ResponseEntity<Map> returnResponse1 = restTemplate.postForEntity(
                     baseUrl + "/borrows", new BorrowRequest(bookTester1.getId(), studentTester.getId()), Map.class);
-            assertThat(borrow1.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+            assertThat(returnResponse1.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-            ResponseEntity<Map> borrow2 = restTemplate.postForEntity(
+            ResponseEntity<Map> returnResponse2 = restTemplate.postForEntity(
                     baseUrl + "/borrows", new BorrowRequest(bookTester2.getId(), studentTester.getId()), Map.class);
-            assertThat(borrow2.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+            assertThat(returnResponse2.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
             // 4. Try to borrow a 3rd book — should return 409 CONFLICT
-            ResponseEntity<Map> borrow3 = restTemplate.postForEntity(
+            ResponseEntity<Map> returnResponse3 = restTemplate.postForEntity(
                     baseUrl + "/borrows", new BorrowRequest(bookTester3.getId(), studentTester.getId()), Map.class);
-            assertThat(borrow3.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+            assertThat(returnResponse3.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         }
 
         @Test
@@ -234,14 +234,19 @@ class LibraryApiIT extends AbstractIntegrationTest {
         @DisplayName("should return 404 when member does not exist")
         void shouldReturn404_WhenMemberNotFound() {
             // TODO: Try to borrow with a non-existent memberId
-            fail("Not implemented yet");
+            Book bookTester = createTestBook("980-1", "Book1", "Author1");
+            ResponseEntity<Map> returnResponse = restTemplate.postForEntity(
+                    baseUrl + "/borrows", new BorrowRequest(bookTester.getId(), 123L), Map.class);
+            assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
 
         @Test
         @DisplayName("should return 404 when book does not exist")
         void shouldReturn404_WhenBookNotFound() {
             // TODO: Try to borrow a non-existent bookId
-            fail("Not implemented yet");
+            Member member = createTestMember("Alvarez", "alvarez@atm.com", MembershipType.STANDARD);
+            ResponseEntity<Map> returnResponse =restTemplate.postForEntity(baseUrl + "/borrows", new BorrowRequest(123L, member.getId()), Map.class);
+            assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
     }
 
