@@ -141,15 +141,29 @@ class BookRepositoryIT extends AbstractIntegrationTest {
             // assertThat(results).allMatch(book -> book.getGenre() == Genre.SCIENCE); // to make it more strict
         }
 
-        
+
 
         @Test
         @DisplayName("should find books by author (case insensitive, partial match)")
         void shouldFindByAuthor() {
-            // TODO: Save books by different authors
-            //       Search by partial author name and verify results
-            fail("Not implemented yet");
+            // Arrange
+            createBook("isbn-1", "The Hobbit", "J.R.R Tolkien", 3, Genre.FICTION);
+            createBook("isbn-2", "The Lord of the Rings", "J.R.R Tolkien", 2, Genre.FICTION);
+            createBook("isbn-3", "Clean Code", "Robert C. Martin", 5, Genre.TECHNOLOGY);
+
+            // Act
+            List<Book> results = bookRepository.findByAuthorContainingIgnoreCase("tolkien");
+            // List<Book> results = bookRepository.findByAuthorContainingIgnoreCase("tol");
+            // ==> even if it is shorter string still it has to work properly and it is working
+
+            // Assert
+            assertThat(results).hasSize(2);
+            assertThat(results)
+                    .extracting(Book::getTitle)
+                    .containsExactlyInAnyOrder("The Hobbit", "The Lord of the Rings");
         }
+
+
 
         @Test
         @DisplayName("should search by author name using searchBooks()")
