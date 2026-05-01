@@ -6,6 +6,7 @@ import com.example.library.repository.BookRepository;
 import com.example.library.repository.BorrowRecordRepository;
 import com.example.library.repository.MemberRepository;
 import com.example.library.dto.BorrowRequest;
+import com.example.library.service.MemberService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,7 @@ class LibraryApiIT extends AbstractIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-//Commit Ferhat test
+
     @Autowired
     private BookRepository bookRepository;
 
@@ -238,7 +239,11 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldCreateMember() {
             // TODO: POST a new member to /api/members
             //       Verify 201 status and response body
-            fail("Not implemented yet");
+            Member member = createTestMember("Diaz", "diaz@gmail.com", MembershipType.STANDARD);
+            ResponseEntity<Map> returnResponse = restTemplate.postForEntity(baseUrl + "/members", member, Map.class);
+           assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+           assertThat(returnResponse.getBody().get("name")).isEqualTo("Diaz");
+           assertThat(returnResponse.getBody().get("email")).isEqualTo("diaz@gmail.com");
         }
 
         @Test
@@ -246,9 +251,15 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldDeactivateMember() {
             // TODO:
             // 1. Create a member
+            Member member = createTestMember("Diaz", "diaz@gmail.com", MembershipType.STANDARD);
             // 2. DELETE /api/members/{id}
+            restTemplate.delete(baseUrl + "/members/" + member.getId());
             // 3. GET /api/members/{id} and verify active = false
-            fail("Not implemented yet");
+            ResponseEntity<Member> returnResponse = restTemplate.getForEntity(baseUrl + "/members/" + member.getId(), Member.class);
+
+            assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(returnResponse.getBody()).isNotNull();
+            assertThat(returnResponse.getBody().isActive()).isFalse();
         }
 
         @Test
@@ -256,7 +267,10 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldReturn400_WhenInvalidEmail() {
             // TODO: POST a member with an invalid email
             //       Verify 400 BAD REQUEST
-            fail("Not implemented yet");
+            Member member = createTestMember("Diaz", "not-a-valid-email", MembershipType.STANDARD);
+            ResponseEntity<Member> returnResponse = restTemplate.postForEntity(baseUrl + "/members" , member, Member.class);
+
+            assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         }
     }
 
