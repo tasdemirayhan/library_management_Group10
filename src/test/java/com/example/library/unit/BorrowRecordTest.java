@@ -124,22 +124,22 @@ class BorrowRecordTest {
         @Test
         @DisplayName("should set borrow date to today")
         void shouldSetBorrowDateToToday() {
-            // TODO: Verify that new BorrowRecord sets borrowDate to LocalDate.now()
-            fail("Not implemented yet");
+            BorrowRecord record = new BorrowRecord(createSampleBook(), createSampleMember());
+            assertEquals(LocalDate.now(), record.getBorrowDate());
         }
 
         @Test
         @DisplayName("should set due date to 14 days from today")
         void shouldSetDueDateTo14DaysFromToday() {
-            // TODO: Verify dueDate = borrowDate + STANDARD_BORROW_DAYS
-            fail("Not implemented yet");
+            BorrowRecord record = new BorrowRecord(createSampleBook(), createSampleMember());
+            assertEquals(LocalDate.now().plusDays(14), record.getDueDate());
         }
 
         @Test
         @DisplayName("should set status to BORROWED")
         void shouldSetStatusToBorrowed() {
-            // TODO: Verify default status is BORROWED
-            fail("Not implemented yet");
+            BorrowRecord record = new BorrowRecord(createSampleBook(), createSampleMember());
+            assertEquals(BorrowStatus.BORROWED, record.getStatus());
         }
     }
 }
