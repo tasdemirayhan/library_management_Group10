@@ -239,11 +239,13 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldCreateMember() {
             // TODO: POST a new member to /api/members
             //       Verify 201 status and response body
-            Member member = createTestMember("Diaz", "diaz@gmail.com", MembershipType.STANDARD);
-            ResponseEntity<Map> returnResponse = restTemplate.postForEntity(baseUrl + "/members", member, Map.class);
-           assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-           assertThat(returnResponse.getBody().get("name")).isEqualTo("Diaz");
-           assertThat(returnResponse.getBody().get("email")).isEqualTo("diaz@gmail.com");
+                Member member = new Member("Diaz", "diaz@gmail.com", MembershipType.STANDARD);
+                ResponseEntity<Map> returnResponse = restTemplate.postForEntity(baseUrl + "/members", member, Map.class);
+
+                assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+                assertThat(returnResponse.getBody().get("name")).isEqualTo("Diaz");
+                assertThat(returnResponse.getBody().get("email")).isEqualTo("diaz@gmail.com");
+            }
         }
 
         @Test
@@ -267,8 +269,8 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldReturn400_WhenInvalidEmail() {
             // TODO: POST a member with an invalid email
             //       Verify 400 BAD REQUEST
-            Member member = createTestMember("Diaz", "not-a-valid-email", MembershipType.STANDARD);
-            ResponseEntity<Member> returnResponse = restTemplate.postForEntity(baseUrl + "/members" , member, Member.class);
+            Member member = new Member("Diaz", "not-a-valid-email", MembershipType.STANDARD);
+            ResponseEntity<Member> returnResponse = restTemplate.postForEntity(baseUrl + "/members", member, Member.class);
 
             assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         }
@@ -295,5 +297,6 @@ class LibraryApiIT extends AbstractIntegrationTest {
             // 4. GET /api/borrows/member/{id}/active — should return only 1
             fail("Not implemented yet");
         }
-    }
+
 }
+
