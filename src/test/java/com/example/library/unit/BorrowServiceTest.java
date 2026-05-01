@@ -174,29 +174,28 @@ class BorrowServiceTest {
         @Test
         @DisplayName("should successfully return a borrowed book")
         void shouldReturnBook_WhenBorrowed() {
-            // TODO: Create a BorrowRecord with BORROWED status
-            //       Mock the repository to return it
-            //       Call returnBook() and verify:
-            //       - status changed to RETURNED
-            //       - returnDate is set
-            //       - available copies increased
-            fail("Not implemented yet");
+            BorrowRecord record = new BorrowRecord(sampleBook, sampleMember);
+            record.setId(1L);
+            when(borrowRecordRepository.findById(1L)).thenReturn(Optional.of(record));
+            BorrowResponse response = borrowService.returnBook(1L);
+            assertEquals(BorrowStatus.RETURNED, response.getStatus());
+            assertEquals(4, sampleBook.getAvailableCopies());
         }
 
         @Test
         @DisplayName("should throw when trying to return an already returned book")
         void shouldThrow_WhenAlreadyReturned() {
-            // TODO: Create a BorrowRecord with RETURNED status
-            //       Verify IllegalStateException is thrown
-            fail("Not implemented yet");
+            BorrowRecord record = new BorrowRecord(sampleBook, sampleMember);
+            record.setStatus(BorrowStatus.RETURNED);
+            when(borrowRecordRepository.findById(1L)).thenReturn(Optional.of(record));
+            assertThrows(IllegalStateException.class, () -> borrowService.returnBook(1L));
         }
 
         @Test
         @DisplayName("should throw when borrow record not found")
         void shouldThrow_WhenRecordNotFound() {
-            // TODO: Mock repository to return empty Optional
-            //       Verify IllegalStateException is thrown
-            fail("Not implemented yet");
+            when(borrowRecordRepository.findById(99L)).thenReturn(Optional.empty());
+            assertThrows(IllegalStateException.class, () -> borrowService.returnBook(99L));
         }
     }
 }
