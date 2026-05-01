@@ -83,37 +83,30 @@ class BorrowRecordTest {
         @Test
         @DisplayName("should return true when checked after due date and still borrowed")
         void shouldBeOverdue_WhenPastDueDateAndStillBorrowed() {
-            BorrowRecord record = new BorrowRecord(createSampleBook(), createSampleMember());
-            LocalDate afterDueDate = record.getDueDate().plusDays(1);
-
-            assertTrue(record.isOverdue(afterDueDate));
+            // TODO: Create a BorrowRecord and check isOverdue() with a date after dueDate
+            fail("Not implemented yet");
         }
 
         @Test
         @DisplayName("should return false when checked before due date")
         void shouldNotBeOverdue_WhenBeforeDueDate() {
-            BorrowRecord record = new BorrowRecord(createSampleBook(), createSampleMember());
-            LocalDate beforeDueDate = record.getDueDate().minusDays(1);
-
-            assertFalse(record.isOverdue(beforeDueDate));
+            // TODO: Create a BorrowRecord and check isOverdue() with a date before dueDate
+            fail("Not implemented yet");
         }
 
         @Test
         @DisplayName("should return false when book is already returned (even if past due)")
         void shouldNotBeOverdue_WhenAlreadyReturned() {
-            BorrowRecord record = new BorrowRecord(createSampleBook(), createSampleMember());
-            record.setStatus(BorrowStatus.RETURNED);
-            LocalDate afterDueDate = record.getDueDate().plusDays(5);
-
-            assertFalse(record.isOverdue(afterDueDate));
+            // TODO: Create a BorrowRecord, set status to RETURNED,
+            //       then check isOverdue() — should be false even if past due
+            fail("Not implemented yet");
         }
 
         @Test
         @DisplayName("should return false on exactly the due date")
         void shouldNotBeOverdue_OnExactDueDate() {
-            BorrowRecord record = new BorrowRecord(createSampleBook(), createSampleMember());
-
-            assertFalse(record.isOverdue(record.getDueDate()));
+            // TODO: Check isOverdue() when asOfDate == dueDate
+            fail("Not implemented yet");
         }
     }
 
