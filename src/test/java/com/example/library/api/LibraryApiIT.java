@@ -6,8 +6,12 @@ import com.example.library.repository.BookRepository;
 import com.example.library.repository.BorrowRecordRepository;
 import com.example.library.repository.MemberRepository;
 import com.example.library.dto.BorrowRequest;
+<<<<<<< HEAD
 
 import org.apache.commons.compress.archivers.dump.DumpArchiveEntry.TYPE;
+=======
+import com.example.library.service.MemberService;
+>>>>>>> origin/Test/Ferhat
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -271,8 +275,17 @@ class LibraryApiIT extends AbstractIntegrationTest {
         @DisplayName("should create a member and return 201")
         void shouldCreateMember() {
             // TODO: POST a new member to /api/members
+<<<<<<< HEAD
             // Verify 201 status and response body
             fail("Not implemented yet");
+=======
+            //       Verify 201 status and response body
+            Member member = createTestMember("Diaz", "diaz@gmail.com", MembershipType.STANDARD);
+            ResponseEntity<Map> returnResponse = restTemplate.postForEntity(baseUrl + "/members", member, Map.class);
+           assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+           assertThat(returnResponse.getBody().get("name")).isEqualTo("Diaz");
+           assertThat(returnResponse.getBody().get("email")).isEqualTo("diaz@gmail.com");
+>>>>>>> origin/Test/Ferhat
         }
 
         @Test
@@ -280,17 +293,31 @@ class LibraryApiIT extends AbstractIntegrationTest {
         void shouldDeactivateMember() {
             // TODO:
             // 1. Create a member
+            Member member = createTestMember("Diaz", "diaz@gmail.com", MembershipType.STANDARD);
             // 2. DELETE /api/members/{id}
+            restTemplate.delete(baseUrl + "/members/" + member.getId());
             // 3. GET /api/members/{id} and verify active = false
-            fail("Not implemented yet");
+            ResponseEntity<Member> returnResponse = restTemplate.getForEntity(baseUrl + "/members/" + member.getId(), Member.class);
+
+            assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(returnResponse.getBody()).isNotNull();
+            assertThat(returnResponse.getBody().isActive()).isFalse();
         }
 
         @Test
         @DisplayName("should return 400 when creating member with invalid email")
         void shouldReturn400_WhenInvalidEmail() {
             // TODO: POST a member with an invalid email
+<<<<<<< HEAD
             // Verify 400 BAD REQUEST
             fail("Not implemented yet");
+=======
+            //       Verify 400 BAD REQUEST
+            Member member = createTestMember("Diaz", "not-a-valid-email", MembershipType.STANDARD);
+            ResponseEntity<Member> returnResponse = restTemplate.postForEntity(baseUrl + "/members" , member, Member.class);
+
+            assertThat(returnResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+>>>>>>> origin/Test/Ferhat
         }
     }
 
