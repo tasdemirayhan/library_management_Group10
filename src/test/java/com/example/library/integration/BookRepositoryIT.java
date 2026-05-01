@@ -218,11 +218,7 @@ class BookRepositoryIT extends AbstractIntegrationTest {
         @Test
         @DisplayName("should handle deleting a book")
         void shouldDeleteBook() {
-<<<<<<< HEAD
-            // TODO: Save a book, delete it, verify it's gone
-            fail("Not implemented yet");
-            // This is added by Furkan
-=======
+
             // Arrange
             Book book = createBook("978-1", "Book 1", "Author 1", 1, Genre.BIOGRAPHY);
             
@@ -231,7 +227,6 @@ class BookRepositoryIT extends AbstractIntegrationTest {
             
             // Assert
             assertThat(!bookRepository.findByIsbn("978-1").isPresent());
->>>>>>> parent of 66978e8 (Revert "Merge remote-tracking branch 'origin/Test/Ferhat' into Test/General")
         }
     }
 }
