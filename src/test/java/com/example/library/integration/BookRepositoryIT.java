@@ -10,13 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * INTEGRATION TEST - Repository Layer
@@ -188,8 +189,14 @@ class BookRepositoryIT extends AbstractIntegrationTest {
         @Test
         @DisplayName("should return empty list when no books match search")
         void shouldReturnEmpty_WhenNoMatch() {
-            // TODO: Search for a keyword that matches nothing
-            fail("Not implemented yet");
+            // Arrange
+            Book book = createBook("978-1", "Book 1", "Author 1", 1, Genre.BIOGRAPHY);
+
+            // Act
+            List<Book> found = bookRepository.searchBooks("non-existent");
+            
+            // Assert
+            assertThat(found.isEmpty());
         }
     }
 
@@ -200,18 +207,31 @@ class BookRepositoryIT extends AbstractIntegrationTest {
         @Test
         @DisplayName("should enforce unique ISBN constraint")
         void shouldEnforceUniqueIsbn() {
-            // TODO: Try to save two books with the same ISBN
-            //       Verify a DataIntegrityViolationException is thrown
-            //       Hint: Use assertThrows() and flush the persistence context
-            fail("Not implemented yet");
+            // Arrange
+            Book book1 = createBook("978-1", "Book 1", "Author 1", 1, Genre.BIOGRAPHY);
+
+            // Act & Assert
+            assertThrows(DataIntegrityViolationException.class,
+                () -> createBook("978-1", "Book 2", "Author 2", 1, Genre.BIOGRAPHY));
         }
 
         @Test
         @DisplayName("should handle deleting a book")
         void shouldDeleteBook() {
+<<<<<<< HEAD
             // TODO: Save a book, delete it, verify it's gone
             fail("Not implemented yet");
             // This is added by Furkan
+=======
+            // Arrange
+            Book book = createBook("978-1", "Book 1", "Author 1", 1, Genre.BIOGRAPHY);
+            
+            // Act
+            bookRepository.delete(book);
+            
+            // Assert
+            assertThat(!bookRepository.findByIsbn("978-1").isPresent());
+>>>>>>> parent of 66978e8 (Revert "Merge remote-tracking branch 'origin/Test/Ferhat' into Test/General")
         }
     }
 }
